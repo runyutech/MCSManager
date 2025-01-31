@@ -69,6 +69,7 @@ const handleLogin = async () => {
     }
     if (result.value === "LOG_OUTED") {
       loginStep.value = 0;
+      await sleep(600);
       await handleLogin()
       return;
     }
