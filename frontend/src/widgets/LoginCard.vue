@@ -58,7 +58,7 @@ const handleLogin = async () => {
   }
   try {
     loginStep.value++;
-    await sleep(600);
+    await sleep(200);
     const result = await login({
       data: formData
     });
@@ -69,12 +69,11 @@ const handleLogin = async () => {
     }
     if (result.value === "LOG_OUTED") {
       loginStep.value = 0;
-      await sleep(600);
       await handleLogin()
       return;
     }
     is2Fa.value = false;
-    await sleep(600);
+    await sleep(200);
     await handleNext();
   } catch (error: any) {
     loginStep.value = 0;
@@ -86,7 +85,7 @@ const handleNext = async () => {
   try {
     await updateUserInfo();
     loginStep.value++;
-    await sleep(1000);
+    await sleep(200);
     loginSuccess();
   } catch (error: any) {
     console.error(error);

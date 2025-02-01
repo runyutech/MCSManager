@@ -10,8 +10,11 @@ export function useCardOperation() {
 
   const LEVEL_LIST = [
     LayoutCardHeight.LARGE,
+    LayoutCardHeight.BIGX,
     LayoutCardHeight.BIG,
+    LayoutCardHeight.MEDIUMX,
     LayoutCardHeight.MEDIUM,
+    LayoutCardHeight.SMALLX,
     LayoutCardHeight.SMALL,
     LayoutCardHeight.MINI
   ];

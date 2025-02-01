@@ -72,7 +72,7 @@ const quickOperations = computed(() =>
       title: t("TXT_CODE_57245e94"),
       icon: PlayCircleOutlined,
       noConfirm: false,
-      type: "default",
+      type: "primary",
       click: async () => {
         try {
           await openInstance().execute({
@@ -274,6 +274,7 @@ onMounted(async () => {
                 v-if="item.noConfirm"
                 class="ml-8"
                 :danger="item.type === 'danger'"
+                :type="item.type"
                 @click="item.click"
               >
                 <component :is="item.icon" />
@@ -285,7 +286,7 @@ onMounted(async () => {
                 :title="t('TXT_CODE_276756b2')"
                 @confirm="item.click"
               >
-                <a-button class="ml-8" :danger="item.type === 'danger'">
+                <a-button class="ml-8" :danger="item.type === 'danger'" :type="item.type">
                   <component :is="item.icon" />
                   {{ item.title }}
                 </a-button>
@@ -324,50 +325,141 @@ onMounted(async () => {
 
   <!-- Other Page View -->
   <CardPanel v-else class="containerWrapper" style="height: 100%">
-    <template #title>
-      <CloudServerOutlined />
-      <span class="ml-8"> {{ getInstanceName }} </span>
-      <span class="ml-8">
-        <a-tag v-if="isRunning" color="green">
-          <CheckCircleOutlined />
-          {{ instanceStatusText }}
-        </a-tag>
-        <a-tag v-else-if="isBuys" color="red">
-          <LoadingOutlined />
-          {{ instanceStatusText }}
-        </a-tag>
-        <a-tag v-else>
-          <InfoCircleOutlined />
-          {{ instanceStatusText }}
-        </a-tag>
-        <a-tag color="purple"> {{ instanceTypeText }} </a-tag>
-      </span>
-    </template>
-    <template #operator>
-      <span
-        v-for="item in quickOperations"
-        :key="item.title"
-        size="default"
-        class="mr-2"
-        v-bind="item.props"
-      >
-        <IconBtn :icon="item.icon" :title="item.title" @click="item.click"></IconBtn>
-      </span>
-      <a-dropdown>
-        <template #overlay>
-          <a-menu>
-            <a-menu-item v-for="item in instanceOperations" :key="item.title" @click="item.click">
-              <component :is="item.icon"></component>
-              <span>&nbsp;{{ item.title }}</span>
-            </a-menu-item>
-          </a-menu>
-        </template>
-        <span size="default" type="primary">
-          <IconBtn :icon="DownOutlined" :title="t('TXT_CODE_fe731dfc')"></IconBtn>
-        </span>
-      </a-dropdown>
-    </template>
+
+<!--    <template #title>-->
+<!--      <CloudServerOutlined />-->
+<!--      <span class="ml-8"> {{ getInstanceName }} </span>-->
+<!--      <span class="ml-8">-->
+<!--        <a-tag v-if="isRunning" color="green">-->
+<!--          <CheckCircleOutlined />-->
+<!--          {{ instanceStatusText }}-->
+<!--        </a-tag>-->
+<!--        <a-tag v-else-if="isBuys" color="red">-->
+<!--          <LoadingOutlined />-->
+<!--          {{ instanceStatusText }}-->
+<!--        </a-tag>-->
+<!--        <a-tag v-else>-->
+<!--          <InfoCircleOutlined />-->
+<!--          {{ instanceStatusText }}-->
+<!--        </a-tag>-->
+<!--        <a-tag color="purple"> {{ instanceTypeText }} </a-tag>-->
+<!--      </span>-->
+<!--    </template>-->
+<!--    <template #operator>-->
+<!--      <span-->
+<!--        v-for="item in quickOperations"-->
+<!--        :key="item.title"-->
+<!--        size="default"-->
+<!--        class="mr-2"-->
+<!--        v-bind="item.props"-->
+<!--      >-->
+<!--        <IconBtn :icon="item.icon" :title="item.title" @click="item.click"></IconBtn>-->
+<!--      </span>-->
+<!--      <a-dropdown>-->
+<!--        <template #overlay>-->
+<!--          <a-menu>-->
+<!--            <a-menu-item v-for="item in instanceOperations" :key="item.title" @click="item.click">-->
+<!--              <component :is="item.icon"></component>-->
+<!--              <span>&nbsp;{{ item.title }}</span>-->
+<!--            </a-menu-item>-->
+<!--          </a-menu>-->
+<!--        </template>-->
+<!--        <span size="default" type="primary">-->
+<!--          <IconBtn :icon="DownOutlined" :title="t('TXT_CODE_fe731dfc')"></IconBtn>-->
+<!--        </span>-->
+<!--      </a-dropdown>-->
+<!--    </template>-->
     <template #body>
+      <div class="mb-24">
+        <BetweenMenus>
+          <template #left>
+            <div class="align-center">
+              <a-typography-title class="mb-0 mr-12" :level="4">
+                <CloudServerOutlined />
+                <span class="ml-6"> {{ getInstanceName }} </span>
+              </a-typography-title>
+              <a-typography-paragraph v-if="!isPhone" class="mb-0 ml-4">
+              <span class="ml-6">
+                <a-tag v-if="isRunning" color="green">
+                  <CheckCircleOutlined />
+                  {{ instanceStatusText }}
+                </a-tag>
+                <a-tag v-else-if="isBuys" color="red">
+                  <LoadingOutlined />
+                  {{ instanceStatusText }}
+                </a-tag>
+                <a-tag v-else>
+                  <InfoCircleOutlined />
+                  {{ instanceStatusText }}
+                </a-tag>
+              </span>
+
+                <a-tag color="purple"> {{ instanceTypeText }} </a-tag>
+
+                <span
+                  v-if="instanceInfo?.watcher && instanceInfo?.watcher > 1 && !isPhone"
+                  class="ml-16"
+                >
+                <a-tooltip>
+                  <template #title>
+                    {{ $t("TXT_CODE_4a37ec9c") }}
+                  </template>
+                  <LaptopOutlined />
+                </a-tooltip>
+                <span class="ml-6" style="opacity: 0.8">
+                  {{ instanceInfo?.watcher }}
+                </span>
+              </span>
+              </a-typography-paragraph>
+            </div>
+          </template>
+          <template #right>
+            <div v-if="!isPhone">
+              <template v-for="item in [...quickOperations, ...instanceOperations]" :key="item.title">
+                <a-button
+                  v-if="item.noConfirm"
+                  class="ml-8"
+                  :danger="item.type === 'danger'"
+                  :type="item.type"
+                  @click="item.click"
+                >
+                  <component :is="item.icon" />
+                  {{ item.title }}
+                </a-button>
+                <a-popconfirm
+                  v-else
+                  :key="item.title"
+                  :title="t('TXT_CODE_276756b2')"
+                  @confirm="item.click"
+                >
+                  <a-button class="ml-8" :danger="item.type === 'danger'" :type="item.type">
+                    <component :is="item.icon" />
+                    {{ item.title }}
+                  </a-button>
+                </a-popconfirm>
+              </template>
+            </div>
+            <a-dropdown v-else>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item
+                    v-for="item in [...quickOperations, ...instanceOperations]"
+                    :key="item.title"
+                    @click="item.click"
+                  >
+                    <component :is="item.icon" />
+                    {{ item.title }}
+                  </a-menu-item>
+                </a-menu>
+              </template>
+              <a-button type="primary">
+                {{ t("TXT_CODE_fe731dfc") }}
+                <DownOutlined />
+              </a-button>
+            </a-dropdown>
+          </template>
+        </BetweenMenus>
+      </div>
       <TerminalCore
         v-if="instanceId && daemonId"
         :instance-id="instanceId"
