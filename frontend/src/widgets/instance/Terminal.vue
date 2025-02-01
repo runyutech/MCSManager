@@ -21,6 +21,8 @@ import { useTerminal } from "../../hooks/useTerminal";
 import { useLayoutCardTools } from "@/hooks/useCardTools";
 import { useScreen } from "@/hooks/useScreen";
 import IconBtn from "@/components/IconBtn.vue";
+import { ButtonType } from 'ant-design-vue/es/button/buttonTypes';
+
 import {
   openInstance,
   stopInstance,
@@ -274,7 +276,7 @@ onMounted(async () => {
                 v-if="item.noConfirm"
                 class="ml-8"
                 :danger="item.type === 'danger'"
-                :type="item.type"
+                :type="item.type as ButtonType"
                 @click="item.click"
               >
                 <component :is="item.icon" />
@@ -286,7 +288,7 @@ onMounted(async () => {
                 :title="t('TXT_CODE_276756b2')"
                 @confirm="item.click"
               >
-                <a-button class="ml-8" :danger="item.type === 'danger'" :type="item.type">
+                <a-button class="ml-8" :danger="item.type === 'danger'" :type="item.type as ButtonType">
                   <component :is="item.icon" />
                   {{ item.title }}
                 </a-button>
@@ -420,7 +422,7 @@ onMounted(async () => {
                   v-if="item.noConfirm"
                   class="ml-8"
                   :danger="item.type === 'danger'"
-                  :type="item.type"
+                  :type="item.type as ButtonType"
                   @click="item.click"
                 >
                   <component :is="item.icon" />
@@ -432,7 +434,7 @@ onMounted(async () => {
                   :title="t('TXT_CODE_276756b2')"
                   @confirm="item.click"
                 >
-                  <a-button class="ml-8" :danger="item.type === 'danger'" :type="item.type">
+                  <a-button class="ml-8" :danger="item.type === 'danger'" :type="item.type as ButtonType">
                     <component :is="item.icon" />
                     {{ item.title }}
                   </a-button>
