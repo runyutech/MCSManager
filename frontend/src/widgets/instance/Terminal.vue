@@ -21,7 +21,7 @@ import { useTerminal } from "../../hooks/useTerminal";
 import { useLayoutCardTools } from "@/hooks/useCardTools";
 import { useScreen } from "@/hooks/useScreen";
 import IconBtn from "@/components/IconBtn.vue";
-import { ButtonType } from 'ant-design-vue/es/button/buttonTypes';
+import type { ButtonType } from 'ant-design-vue/es/button/buttonTypes';
 
 import {
   openInstance,
