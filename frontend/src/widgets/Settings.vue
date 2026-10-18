@@ -126,6 +126,21 @@ const allYesNo = [
   }
 ];
 
+const apiKeyAccessOptions = [
+  {
+    label: t("TXT_CODE_52c8a730"),
+    value: true
+  },
+  {
+    label: t("TXT_CODE_675e5397"),
+    value: "ONLY_ADMIN"
+  },
+  {
+    label: t("TXT_CODE_718c9310"),
+    value: false
+  }
+];
+
 const aboutLinks = arrayFilter([
   {
     title: "GitHub",
@@ -386,6 +401,29 @@ onMounted(async () => {
                       {{ t("TXT_CODE_af19b7b5") }}
                     </a-typography-text>
                   </a-typography-paragraph>
+
+                  <a-form-item>
+                    <a-typography-title :level="5">
+                      {{ t("TXT_CODE_95192169") }}
+                    </a-typography-title>
+                    <a-typography-paragraph>
+                      <a-typography-text type="secondary">
+                        {{ t("TXT_CODE_820260c5") }}
+                      </a-typography-text>
+                    </a-typography-paragraph>
+                    <a-select
+                      v-model:value.prop="(formData as any).enableApiKey"
+                      style="max-width: 320px"
+                    >
+                      <a-select-option
+                        v-for="item in apiKeyAccessOptions"
+                        :key="item.value"
+                        :value="item.value"
+                      >
+                        {{ item.label }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
 
                   <a-form-item>
                     <a-typography-title :level="5">

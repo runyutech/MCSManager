@@ -74,6 +74,7 @@ export interface Settings {
   presetPackAddr: string;
   redisUrl: string;
   allowUsePreset: boolean;
+  enableApiKey: boolean | "ONLY_ADMIN";
   businessMode: boolean;
   businessId: string;
 }

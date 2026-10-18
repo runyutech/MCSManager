@@ -3,6 +3,10 @@ import { GlobalVariable } from "common";
 import userSystem from "../service/user_service";
 import { getUuidByApiKey, ILLEGAL_ACCESS_KEY, isAjax, logout } from "../service/passport_service";
 import { $t } from "../i18n";
+import { ROLE } from "../entity/user";
+import { systemConfig } from "../setting";
+import { isUnsafeIntegrationTestRequest } from "../utils/integration_test_mode";
+import { checkApiKey } from "../utils/safe";
 
 function requestSpeedLimit(ctx: Koa.ParameterizedContext) {
   const SESSION_REQ_TIME = "lastRequestTime";
@@ -46,6 +50,11 @@ function tooFast(ctx: Koa.ParameterizedContext) {
   ctx.body = `[TooFast] ${$t("TXT_CODE_permission.tooFast")}`;
 }
 
+function disabledApiKey(ctx: Koa.ParameterizedContext) {
+  ctx.status = 403;
+  ctx.body = $t("TXT_CODE_db253979");
+}
+
 interface IPermissionCfg {
   token?: boolean;
   level?: number | null;
@@ -55,6 +64,15 @@ interface IPermissionCfg {
 // Basic user permission middleware
 export default (parameter: IPermissionCfg) => {
   return async (ctx: Koa.ParameterizedContext, next: Function) => {
+    // Unsafe integration-test mode bypass: when the panel is started with
+    // `--Unsafe-Integration-Test-Mode=<key>` (parameter name case-insensitive)
+    // and the request carries an `x-request-api-key` header equal to `<key>`,
+    // skip every permission check below and go straight to the route handler.
+    // See utils/integration_test_mode.ts for the security warning.
+    if (isUnsafeIntegrationTestRequest(ctx.request?.header["x-request-api-key"])) {
+      return await next();
+    }
+
     if (
       (parameter.speedLimit == null || parameter.speedLimit === true) &&
       Number(parameter.level) < 10
@@ -72,8 +90,20 @@ export default (parameter: IPermissionCfg) => {
      */
     const key = ctx.request?.header["x-request-api-key"] || ctx.query.apikey;
     if (key) {
+      const enableApiKey = systemConfig?.enableApiKey || false;
+      if (!enableApiKey) return disabledApiKey(ctx);
+
+      // Validate apiKey: only A-Z, a-z, 0-9 are allowed. Anything else is
+      // rejected before it can reach the query layer (e.g. a leading `%`,
+      // which QueryWrapper would otherwise treat as a LIKE wildcard).
       const apiKey = String(key);
+      if (!checkApiKey(apiKey)) {
+        return apiError(ctx);
+      }
+
       const user = getUuidByApiKey(apiKey);
+      if (user && enableApiKey === "ONLY_ADMIN" && user.permission < ROLE.ADMIN)
+        return disabledApiKey(ctx);
       if (user && user.permission >= Number(parameter.level)) {
         return await next();
       } else {

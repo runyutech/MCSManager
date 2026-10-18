@@ -11,6 +11,7 @@ import { $t } from "../i18n";
 import { ROLE } from "../entity/user";
 import { getInstancesByUuid } from "../service/instance_service";
 import { toBoolean } from "common";
+import { systemConfig } from "../setting";
 
 const router = new Router({ prefix: "/auth" });
 
@@ -72,6 +73,12 @@ router.put("/api", permission({ level: ROLE.USER }), async (ctx: Koa.Parameteriz
   try {
     if (user) {
       if (enable) {
+        const enableApiKey = systemConfig?.enableApiKey || false;
+        if (!enableApiKey) throw new Error($t("TXT_CODE_db253979"));
+
+        if (enableApiKey === "ONLY_ADMIN" && user.permission < ROLE.ADMIN)
+          throw new Error($t("TXT_CODE_db253979"));
+
         newKey = v4().replace(/-/gim, "");
         await userSystem.edit(userUuid, {
           apiKey: newKey

@@ -21,6 +21,10 @@ import { middleware as protocolMiddleware } from "./app/middleware/protocol";
 import { mountRouters } from "./app/index";
 import versionAdapter from "./app/service/version_adapter";
 import { removeTrail } from "common";
+import {
+  getUnsafeIntegrationTestModeKey,
+  parseUnsafeIntegrationTestModeArg
+} from "./app/utils/integration_test_mode";
 
 export let COOKIE_KEY = ''
 
@@ -75,6 +79,17 @@ process.stdin.on("data", (v) => {
 });
 
 async function main() {
+  // Detect the unsafe integration-test mode flag before anything else, so the
+  // permission middleware can bypass checks for requests carrying the key.
+  parseUnsafeIntegrationTestModeArg(process.argv);
+  if (getUnsafeIntegrationTestModeKey()) {
+    logger.warn(
+      "SECURITY WARNING: Unsafe integration-test mode is ENABLED. " +
+        "Requests with the matching x-request-api-key header bypass ALL permission checks. " +
+        "Never use this on a production instance."
+    );
+  }
+
   // load global configuration file
   initSystemConfig();
   initEnvConfig();

@@ -31,6 +31,7 @@ onMounted(async () => {
   if(route.query.usr){ //自动登陆 url参数usr和pwd
     formData.username=String(route.query.usr)
     formData.password=String(route.query.pwd)
+
     await router.replace({ ...route, query: {} })
     await handleLogin()
   }

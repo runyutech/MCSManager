@@ -9,6 +9,7 @@ import { logger } from "./log";
 import { User } from "../entity/user";
 import { $t } from "../i18n";
 import { COOKIE_KEY } from "../../app";
+import { checkApiKey } from "../utils/safe";
 
 export const BAN_IP_COUNT = "banip";
 export const LOGIN_FAILED_KEY = "loginFailed";
@@ -214,6 +215,10 @@ export function checkBanIp(ctx: Koa.ParameterizedContext) {
 }
 
 export function getUuidByApiKey(apiKey: string) {
+  // Defense in depth: callers also pass `ctx.query.apikey` straight in, so
+  // re-validate here. `LocalFileSource` treats a condition value starting with
+  // `%` as a wildcard, so an unvalidated key could match other users.
+  if (!checkApiKey(apiKey)) return null;
   const pageData = userSystem.getQueryWrapper().selectPage(
     {
       apiKey

@@ -48,6 +48,11 @@ export default class SystemConfig {
   // Quick installation address
   presetPackAddr = "https://script.mcsmanager.com/templates.json";
 
+  // This option determines whether the entire panel can use an API key.
+  // If set to false, even if the user has already generated an API key,
+  // they will no longer be able to use it.
+  enableApiKey: boolean | "ONLY_ADMIN" = false;
+
   // Redis address (Experimental Features)
   redisUrl = "";
 

@@ -53,6 +53,7 @@ router.put("/setting", permission({ level: ROLE.ADMIN }), async (ctx) => {
     if (config.presetPackAddr != null) systemConfig.presetPackAddr = String(config.presetPackAddr);
     if (config.businessMode != null) systemConfig.businessMode = Boolean(config.businessMode);
     if (config.businessId != null) systemConfig.businessId = String(config.businessId);
+    if (config.enableApiKey != null) systemConfig.enableApiKey = config.enableApiKey;
     if (config.language != null) {
       logger.warn($t("TXT_CODE_e29a9317"), config.language);
       systemConfig.language = String(config.language);
